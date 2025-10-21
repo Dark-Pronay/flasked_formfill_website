@@ -1,0 +1,34 @@
+<!-- #step 1: go to the folder first in gitbash
+#step 2: git create venv as .venv(python -m venv venv) or automatic vs command
+#step 3: in gitbash activate venv (source .venv/Scripts/activate) || in cmd (.venv\Scripts\activate)
+#step 4: git install flask (pip install flask)
+#step 5: python file_name.py (python test.py) to run the program
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello  World</title>   
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js"></script>
+ </head>
+<body>  
+
+<div> <!-- this part input your name and greet you by showing name in same button you clicked-->
+  <input id="st" type="text" placeholder="Enter your name">
+  <h1>Hello</h1>
+  <h1>pronay ghosh</h1>
+  <button onclick=" var name = document.getElementById('st').value || 'oops! no name';
+                    this.innerText = name;"
+    > Greet Me</button>
+</div>
+
+<div>
+ <h1>Build Web App Using Flask and SQLite</h1>
+    <button class="btn" type="button" onclick="window.location.href='{{ url_for('join') }}' ;">Fill form to get updates</button><br/>
+    <button class="btn" type="button" onclick="window.location.href='{{ url_for('participants') }}' ;" >Check participant list</button>
+</div>
+
+</body>
+
+</html>
