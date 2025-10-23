@@ -1,1 +1,76 @@
+#Server Code (Python Standard Library)
+#We can use Python’s http.server and sqlite3.
+#from http.server import HTTPServer, BaseHTTPRequestHandler
 
+import sqlite3
+import urllib.parse
+
+# 1. Create SQLite database and table
+conn = sqlite3.connect('data.db')
+c = conn.cursor()
+c.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL
+)
+''')
+conn.commit()
+conn.close()
+
+# 2. Create HTTP Request Handler
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Serve a simple HTML form
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        html = """
+        <html>
+        <body>
+            <h2>Submit your info</h2>
+            <form method="POST" action="/">
+                Name: <input type="text" name="name"><br>
+                Email: <input type="email" name="email"><br>
+                <input type="submit" value="Submit">
+            </form>
+        </body>
+        </html>
+        """
+        self.wfile.write(html.encode('utf-8'))
+
+    def do_POST(self):
+        # Read form data
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = urllib.parse.parse_qs(post_data.decode('utf-8'))
+
+        name = data.get('name', [''])[0]
+        email = data.get('email', [''])[0]
+
+        # Save to SQLite
+        conn = sqlite3.connect('data.db')
+        c = conn.cursor()
+        c.execute('INSERT INTO users (name, email) VALUES (?, ?)', (name, email))
+        conn.commit()
+        conn.close()
+
+        # Response
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        response = f"""
+        <html>
+        <body>
+            <h2>Thanks, {name}! Your info is saved.</h2>
+            <a href="/">Go back</a>
+        </body>
+        </html>
+        """
+        self.wfile.write(response.encode('utf-8'))
+
+# 3. Run server
+server_address = ('', 8080)  # Listen on localhost:8080
+httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
+print("Server running at http://localhost:8080")
+httpd.serve_forever()
